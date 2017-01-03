@@ -398,9 +398,6 @@ nextrow:
     Private Sub CheckTravlers()
         'My.Settings.MaxAge = 0
         'If ToolStripMenuItem6.Checked Then My.Settings.MaxAge = 100
-        'If ToolStripMenuItem5.Checked Then My.Settings.MaxAge = 50
-        'If ToolStripMenuItem4.Checked Then My.Settings.MaxAge = 25
-        'If ToolStripMenuItem3.Checked Then My.Settings.MaxAge = 10
         'If ToolStripMenuItem1.Checked Then My.Settings.MaxAge = 5
         'My.Settings.Save()
         If ComboBox1.SelectedItem.ToString = "DEPT" Then Exit Sub
