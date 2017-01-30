@@ -184,9 +184,9 @@ Public Class XRLOT
     Private Function AlloysQuery(CommandNum As Integer, SearchShop As String) As String
         Dim S As Object
         AlloysQuery = ""
-
-        objConn.Open()
         Try
+            objConn.Open()
+
             AlloyDataAdapter.SelectCommand.Parameters.Clear()
             AlloyDataAdapter.SelectCommand.CommandText = "SELECT  ALLOY_DESCR FROM  ALLOYS WHERE  (PARTNO = @PARTNO)"
             AlloyDataAdapter.SelectCommand.Parameters.AddWithValue("@PARTNO", TextBox1.Text)

@@ -78,8 +78,9 @@ tryonemoregain:
             Using CMD As New SqlClient.SqlCommand(SQL)
                 Using CN As New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-;")
                     CMD.Connection = CN
-                    CN.Open()
                     Try
+                        CN.Open()
+
                         Using sqrd As SqlClient.SqlDataReader = CMD.ExecuteReader
 
                             Do While sqrd.Read

@@ -38,7 +38,7 @@
     <PublisherName>Prasinos</PublisherName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>336</ApplicationRevision>
+    <ApplicationRevision>338</ApplicationRevision>
     <ApplicationVersion>3.4.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -231,6 +231,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SQLGeneration.vb" />
+    <Compile Include="SQLUpdater.vb" />
     <Compile Include="XRLOT.Designer.vb">
       <DependentUpon>XRLOT.vb</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -19,27 +19,24 @@ Public Class SQLGenerator
     Public Shared Function CheckOpenPoReviews(UserName As String) As String
 
         Dim cmd As New SqlClient.SqlCommand
-        cmd.CommandText = "SELECT  SUM(CASE WHEN QUALITY=UPPER(@USERNAME) AND ISNULL(QREL,0)=0 AND ISNULL(SREL,0)=1 THEN 1 ELSE 0 END ) AS QREL, SUM(CASE WHEN QUALITY=@USERNAME AND ISNULL(QSHIP,0)=0  AND ISNULL(SREL,0)=1 THEN 1 ELSE 0 END ) AS QSHIP, " &
-                            "SUM(CASE WHEN A.SALES=@USERNAME AND ISNULL(SREL,0)=0 THEN 1 ELSE 0 END) AS SREL, SUM(CASE WHEN SALES=@USERNAME AND SSHIP=0 THEN 1 ELSE 0 END ) AS SSHIP, " &
-                            "SUM(CASE WHEN PROD=@USERNAME And ISNULL(PREL,0)=0  AND ISNULL(SREL,0)=1 THEN 1 ELSE 0 END) As PREL, SUM(Case When PROD=@USERNAME And ISNULL(PSHIP,0)=0  AND ISNULL(SREL,0)=1 Then 1 Else 0 End ) As PSHIP, " &
-                            "SUM(CASE WHEN ENG=@USERNAME AND ISNULL(EREL, 0)=0  AND ISNULL(SREL,0)=1 THEN 1 ELSE 0 END) AS EREL, SUM(CASE WHEN ENG=@USERNAME AND ISNULL(ESHIP,0)=0  AND ISNULL(SREL,0)=1 THEN 1 ELSE 0 END ) AS ESHIP " &
-                            "From WFLOCAL..PO_REVIEW A " &
-                            "Left JOIN " &
-                               "(" &
-                                "Select SALES_ORDER_NO, MAX(TTIMESTAMP) AS MAXTIME " &
-                                "From WFLOCAL..PO_REVIEW " &
-                                "Group By SALES_ORDER_NO " &
-                                ") B " &
-                           " On  A.SALES_ORDER_NO=B.SALES_ORDER_NO where  A.TTIMESTAMP=B.MAXTIME"
+        cmd.CommandType = CommandType.StoredProcedure
+        cmd.CommandText = "OpenTicketsQtyPerUser"
         cmd.Parameters.AddWithValue("@USERNAME", UCase(Environment.UserName))
+        Dim H As String = UCase(Environment.UserName)
+        'MsgBox("'" & UCase(Environment.UserName) & "'")
         cmd.Connection = PPForm.objConnCurr
-        PPForm.objConnCurr.Open()
-
         Try
+            PPForm.objConnCurr.Open()
+
+
             Using RD As SqlClient.SqlDataReader = cmd.ExecuteReader
+
                 While RD.Read
+                    If RD("SREL").ToString = DBNull.Value.ToString Then GoTo notickets
                     Dim RelHold As Integer = CInt(RD("SREL")) + CInt(RD("QREL")) + CInt(RD("PREL")) + CInt(RD("EREL"))
                     Dim ShipHold As Integer = CInt(RD("SSHIP")) + CInt(RD("QSHIP")) + CInt(RD("PSHIP")) + CInt(RD("ESHIP"))
+
+
                     Debug.Print(PPForm.TabControl1.TabPages.Count)
                     If RelHold + ShipHold <> 0 And PPForm.TabControl1.TabPages.Count <> 3 Then
 
@@ -47,7 +44,7 @@ Public Class SQLGenerator
                     ElseIf RelHold + ShipHold <> 0 Then
                         CheckOpenPoReviews = "You have " & RelHold & " active holds on release & " & ShipHold & " active holds on shipment"
                     Else
-
+notickets:
                         CheckOpenPoReviews = "You have zero active holds at this time"
 
                         If PPForm.TabControl1.TabPages.Count = 3 Then

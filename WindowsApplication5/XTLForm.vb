@@ -51,7 +51,7 @@ Public Class XTLForm
             XTLtable.Clear()
             objConn.Open()
             XTLDataAdapter.SelectCommand = New SqlClient.SqlCommand
-            XTLDataAdapter.SelectCommand.CommandText = "Select PARTNO, OPERATION_NO, OPERATION_DESCR, WC_DESC, WORKCENTER, DWELL From WFLOCAL..TIMELINE where PARTNO=@partno  ORDER BY OPERATION_NO"
+            XTLDataAdapter.SelectCommand.CommandText = "Select PARTNO, OPERATION_NO, OPERATION_DESCR, WC_DESC, WORKCENTER, DWELL, MILESTONE From WFLOCAL..TIMELINE where PARTNO=@partno  ORDER BY OPERATION_NO"
             XTLDataAdapter.SelectCommand.Parameters.AddWithValue("@PARTNO", TextBox1.Text)
             XTLDataAdapter.SelectCommand.Connection = objConn
 

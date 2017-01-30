@@ -110,6 +110,7 @@ Public Class SignOffForm
     End Sub
 
     Public Function PullTicketInfo() As String()
+        LockChecks = True
         PPForm.objConnCurr.Open()
         Dim Role(4) As String
         Try
@@ -156,8 +157,11 @@ Public Class SignOffForm
             End Using
         Catch : Finally
             PPForm.objConnCurr.Close()
+            LockChecks = False
         End Try
+
         Return Role
+
     End Function
 
     Private Function GetRole() As String
