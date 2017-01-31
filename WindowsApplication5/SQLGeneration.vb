@@ -21,7 +21,7 @@ Public Class SQLGenerator
         Dim cmd As New SqlClient.SqlCommand
         cmd.CommandType = CommandType.StoredProcedure
         cmd.CommandText = "OpenTicketsQtyPerUser"
-        cmd.Parameters.AddWithValue("@USERNAME", UCase(Environment.UserName))
+        cmd.Parameters.AddWithValue("@USERNAME", UCase(UserName))
         Dim H As String = UCase(Environment.UserName)
         'MsgBox("'" & UCase(Environment.UserName) & "'")
         cmd.Connection = PPForm.objConnCurr

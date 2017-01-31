@@ -87,6 +87,8 @@ Public Class XRLOT
         ' SHOWLOTS.Checked = True
         AddHandler Me.SHOWLOTS.CheckedChanged, AddressOf SHOWLOTS_CheckedChanged
         AddHandler Me.ShowDetail.CheckedChanged, AddressOf ShowDetail_CheckedChanged
+        Me.Text = Split(Me.Text & " -- ", " -- ")(0) & " -- " & PPForm.GetLastUpdate("CERT_ERRORS").ToString
+
     End Sub
 
     Private Sub SHOWLOTS_CheckedChanged(sender As Object, e As EventArgs) Handles SHOWLOTS.CheckedChanged
@@ -175,7 +177,7 @@ Public Class XRLOT
         'Me.BringToFront()
         Me.Activate()
         ' RestoreColumnOrder()
-
+        Me.Text = Split(Me.Text & " -- ", " -- ")(0) & " -- " & PPForm.GetLastUpdate("CERT_ERRORS").ToString
         AddHandler Me.DataGridView1.SelectionChanged, AddressOf Me.DataGridView1_SelectionChanged
 
     End Sub

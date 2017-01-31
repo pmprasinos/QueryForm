@@ -6,9 +6,12 @@ Imports System.Net.NetworkInformation
 Imports System
 Imports System.Runtime.InteropServices
 Imports System.ComponentModel
+Imports WebfocusDLL
+Imports System.Threading
 
-Class class1
+Public Class class1
 
+    Dim wf As WebfocusDLL.WebfocusModule
     Public Shared ClassID As Int16
     Public Downloading As Boolean = False
     Public FileNum As Integer
@@ -18,6 +21,11 @@ Class class1
     Dim GlobalFile As String
     Dim wc As WebClient
 
+    Public BusyUpdating As Boolean = False
+
+    Public Sub New()
+        wf = Nothing
+    End Sub
 
     Sub SpeedTest(MB As Integer)
         If Downloading Then Exit Sub
@@ -218,56 +226,57 @@ Class class1
         'If Not (class1.XOpenVisible) And Not (class1.XTLVisible) And Not (class1.XRVisible) Then CallDefaultForm()
     End Sub
 
-    Public Shared Sub UpdateData()
+    Public Sub UpdateDBs()
 
-        'Dim ShareddbPath As String = "\\slfs01\shared\prasinos\SOLines.accdb"
-        '' If Environment.UserName = "PPrasinos" Then ShareddbPath = "\\slfs01\shared\prasinos\SOLines1.accdb"
+        Try
 
-        'Cursor.Current = Cursors.WaitCursor
 
-        ''If Environment.UserName = "PPRASINOS" Then
-        ''    ShareddbPath = Replace(ShareddbPath, "SOLines", "SOLines1")
-        ''End If
+            If Environment.UserName = "PPrasinos" Or Environment.UserName = "JJudson" Then
+                If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt") And BusyUpdating = False Then Exit Sub
+                BusyUpdating = True
+                Debug.Print(DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()))
+                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()) >= 1 And True Then
+                    wf = wfLogin(wf)
+                    wf.GetReporthAsync("qavistes/qavistes.htm#wipandshopco", "pprasinos:pprasino/customlotshtml.fex", "lots")
+                    wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/fingoodshtml.fex", "fingoods")
+                    If Hour(Now) Mod 3 = 1 And Minute(Now) < 20 Then wf.GetReporthAsync("qavistes/qavistes.htm#certificateo", "pprasinos:pprasino/sl_wipfg_quality_check_inspbeyondhtml.fex", "certs")
+                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
+                    'If IncludeCertCheck Then 
+                End If
 
-        'If Not FileIO.FileSystem.DirectoryExists("\\slfs01\shared\prasinos\HOLDPULLS") Then
+                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("OPEN_ORDERS"), Now()) > 60 And True Then
+                    If IsNothing(wf) Then wf = wfLogin(wf)
+                    wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/custom_open_order_reportshtml.fex", "opens")
+                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
+                End If
 
-        '    'If Environment.UserName = "PPRASINOS" Then GoTo skip
-        '    Dim TimeDifference As New Random
-        '    Try
-        '        Dim ThisUserDocs As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments
-        '        ThisUserDocs = Replace(ThisUserDocs, "mreyes", "mgonzales")
-        '        If Not FileIO.FileSystem.DirectoryExists(ThisUserDocs & "\SalesTrackData") Then
-        '            FileIO.FileSystem.CreateDirectory(ThisUserDocs & "\SalesTrackData")
-        '        End If
 
-        '        If FileIO.FileSystem.FileExists(ThisUserDocs & "\SalesTrackData\SalesInfo.accdb") Then
+                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("SHIPMENTS"), Now()) > 15 And True Then
+                    If IsNothing(wf) Then wf = wfLogin(wf)
+                    Dim ShipRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23salesshipmen&IBIMR_fex=pprasino/full_shipreport_by_lothtml.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/shipping_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&SHIPPED_D=" & MakeWebfocusDate(PPForm.GetLastUpdate("SHIPMENTS")) & "&IBIMR_random=58708"
+                    wf.GetReporthAsync(ShipRef, "ships")
+                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
+                End If
+                Debug.Print("PULL STARTED" & Now)
+                If IsNothing(wf) Then Exit Sub
 
-        '            If DateTime.Compare(Now, FileIO.FileSystem.GetFileInfo(ThisUserDocs & "\SalesTrackData\SalesInfo.accdb").LastWriteTime.AddSeconds(TimeDifference.Next(1, 30))) > 0 Then
-        '                Dim LastUpdate As Date = FileIO.FileSystem.GetFileInfo(ShareddbPath).LastWriteTime
-        '                Dim LastUpdateInt As Integer = (LastUpdate.DayOfYear * 24 * 60) + (Hour(LastUpdate) * 60) + Minute(LastUpdate)
-        '                Dim LastPull As Date = FileIO.FileSystem.GetFileInfo(ThisUserDocs & "\SALESTRACKDATA\SALESINFO.ACCDB").LastWriteTime
-        '                Dim LastPullInt As Integer = (LastPull.DayOfYear * 24 * 60) + (Hour(LastPull) * 60) + Minute(LastPull)
+                Do Until InStr(wf.GetRequests, "WaitingForActivation") = 0
+                    Debug.Print(wf.GetRequests)
+                    Threading.Thread.Sleep(50000)
+                Loop
+                If InStr(wf.GetRequests, "opens") > 1 Then SQLUpdater.OpensUpdater(wf)
+                If InStr(wf.GetRequests, "lots") > 1 Or InStr(wf.GetRequests, "ships") > 1 Then SQLUpdater.UpdateWIP(wf)
+                FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
+                wf = Nothing
 
-        '                If LastUpdateInt - LastPullInt > 5 Then
-        '                    '     PPForm.Text = "UPDATING..."
-        '                    ' FileIO.FileSystem.CopyFile(ShareddbPath, ThisUserDocs & "\SalesTrackData\SalesInfo.accdb", True)
-        '                End If
-        '            End If
-        '        Else
-        '            '  PPForm.Text = "UPDATING..."
-        '            ' FileIO.FileSystem.CopyFile(ShareddbPath, ThisUserDocs & "\SalesTrackData\SalesInfo.accdb", True)
-        '        End If
-        '        '     PPForm.Text = "Open Orders Search (" & CStr(FileIO.FileSystem.GetFileInfo(ThisUserDocs & "\SALESTRACKDATA\SALESINFO.ACCDB").LastWriteTime.ToString) & ")"
+            End If
 
-        '    Catch ex As Exception
-        '        ' If Environment.UserName = "MREYES" Or Environment.UserName = "PPRASINOS" Then MsgBox(ex.Message & "  found in code on 1:")
-        '        '                PPForm.Text = PPForm.Text & " OFFLINE"
-
-        '    End Try
-        'End If
-        'Cursor.Current = Cursors.Default
-skip:
+        Catch ex As Exception
+        End Try
+        BusyUpdating = False
     End Sub
+
+
 
     Public Shared Function GetUserPasswordandFex() As String()
         Dim h As New Random
