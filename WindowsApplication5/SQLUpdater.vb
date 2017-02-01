@@ -130,7 +130,7 @@ emailerror:
     Public Function UpdateOpens()
         Try
             If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt") Then
-                If DateDiff(DateInterval.Minute, FileIO.FileSystem.GetFileInfo("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt").LastWriteTime, Now) > 4 Then
+                If DateDiff(DateInterval.Minute, FileIO.FileSystem.GetFileInfo("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt").LastWriteTime, Now) > 10 Then
                     FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
                 End If
             Else

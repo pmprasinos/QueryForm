@@ -232,6 +232,9 @@ Public Class class1
 
 
             If Environment.UserName = "PPrasinos" Or Environment.UserName = "JJudson" Then
+
+
+
                 If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt") And BusyUpdating = False Then Exit Sub
                 BusyUpdating = True
                 Debug.Print(DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()))
@@ -264,11 +267,13 @@ Public Class class1
                     Debug.Print(wf.GetRequests)
                     Threading.Thread.Sleep(50000)
                 Loop
+                Debug.Print("STARTED " & Now())
+
                 If InStr(wf.GetRequests, "opens") > 1 Then SQLUpdater.OpensUpdater(wf)
                 If InStr(wf.GetRequests, "lots") > 1 Or InStr(wf.GetRequests, "ships") > 1 Then SQLUpdater.UpdateWIP(wf)
-                FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
+                'FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
                 wf = Nothing
-
+                Debug.Print("DONE " & Now())
             End If
 
         Catch ex As Exception
