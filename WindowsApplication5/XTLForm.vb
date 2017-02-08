@@ -41,11 +41,7 @@ Public Class XTLForm
         'Dim XTLBindingSource As BindingSource
         'Dim StaticDataset As DataSet
         'Dim StatConnect As OleDb.OleDbConnectionStringBuilder
-
-
-
         Dim objConn As New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-;")
-
 
         Try
             XTLtable.Clear()
@@ -113,7 +109,7 @@ Public Class XTLForm
         End If
         ' My.Settings.Reload()
         If Not My.Settings.XTLColumnOrder Is Nothing Then
-            For i = 0 To My.Settings.XTLColumnOrder.Count - 1
+            For i = 0 To DataGridView3.ColumnCount - 1
                 Dim IndexPart As Integer = CInt(My.Settings.XTLColumnOrder(i).ToString)
                 Debug.Print(My.Settings.XTLColumnOrder(i).ToString)
                 DataGridView3.Columns(i).DisplayIndex = IndexPart

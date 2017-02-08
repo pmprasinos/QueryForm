@@ -8,6 +8,7 @@ Imports System.Runtime.InteropServices
 Imports System.ComponentModel
 Imports WebfocusDLL
 Imports System.Threading
+Imports Microsoft.Win32
 
 Public Class class1
 
@@ -87,7 +88,7 @@ Public Class class1
         '   FileSizes = {100, 10, 1}
         ' For Each FileSize In FileSizes
         TimeToDownload = ""
-        Debug.Print(FileSize)
+        'Debug.Print(FileSize)
         GlobalFile = FileSize.ToString
         TIMESTARTED = Now
         SpeedTest(FileSize)
@@ -102,7 +103,7 @@ Public Class class1
             Dim addresses() As Net.IPAddress = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName).AddressList
             For i As Integer = addresses.Count / 2 To addresses.Count - 1
                 ap = ap & "[" & addresses(i).ToString & "]"
-                Debug.Print(ap)
+                '  Debug.Print(ap)
             Next
 
             Dim y As Boolean = False
@@ -226,60 +227,60 @@ Public Class class1
         'If Not (class1.XOpenVisible) And Not (class1.XTLVisible) And Not (class1.XRVisible) Then CallDefaultForm()
     End Sub
 
-    Public Sub UpdateDBs()
+    'Public Sub UpdateDBs()
 
-        Try
-
-
-            If Environment.UserName = "PPrasinos" Or Environment.UserName = "JJudson" Then
+    '    Try
 
 
-
-                If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt") And BusyUpdating = False Then Exit Sub
-                BusyUpdating = True
-                Debug.Print(DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()))
-                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()) >= 1 And True Then
-                    wf = wfLogin(wf)
-                    wf.GetReporthAsync("qavistes/qavistes.htm#wipandshopco", "pprasinos:pprasino/customlotshtml.fex", "lots")
-                    wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/fingoodshtml.fex", "fingoods")
-                    If Hour(Now) Mod 3 = 1 And Minute(Now) < 20 Then wf.GetReporthAsync("qavistes/qavistes.htm#certificateo", "pprasinos:pprasino/sl_wipfg_quality_check_inspbeyondhtml.fex", "certs")
-                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
-                    'If IncludeCertCheck Then 
-                End If
-
-                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("OPEN_ORDERS"), Now()) > 60 And True Then
-                    If IsNothing(wf) Then wf = wfLogin(wf)
-                    wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/custom_open_order_reportshtml.fex", "opens")
-                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
-                End If
+    '        If Environment.UserName = "PPrasinos" Or Environment.UserName = "JJudson" Then
 
 
-                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("SHIPMENTS"), Now()) > 15 And True Then
-                    If IsNothing(wf) Then wf = wfLogin(wf)
-                    Dim ShipRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23salesshipmen&IBIMR_fex=pprasino/full_shipreport_by_lothtml.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/shipping_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&SHIPPED_D=" & MakeWebfocusDate(PPForm.GetLastUpdate("SHIPMENTS")) & "&IBIMR_random=58708"
-                    wf.GetReporthAsync(ShipRef, "ships")
-                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt", "", True)
-                End If
-                Debug.Print("PULL STARTED" & Now)
-                If IsNothing(wf) Then Exit Sub
 
-                Do Until InStr(wf.GetRequests, "WaitingForActivation") = 0
-                    Debug.Print(wf.GetRequests)
-                    Threading.Thread.Sleep(50000)
-                Loop
-                Debug.Print("STARTED " & Now())
+    '            If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt") And BusyUpdating = False Then Exit Sub
+    '            BusyUpdating = True
+    '            Debug.Print(DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()))
+    '            If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("CERT_ERRORS"), Now()) >= 1 And True Then
+    '                wf = wfLogin(wf)
+    '                wf.GetReporthAsync("qavistes/qavistes.htm#wipandshopco", "pprasinos:pprasino/customlotshtml.fex", "lots")
+    '                wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/fingoodshtml.fex", "fingoods")
+    '                If Hour(Now) Mod 3 = 1 And Minute(Now) < 20 Then wf.GetReporthAsync("qavistes/qavistes.htm#certificateo", "pprasinos:pprasino/sl_wipfg_quality_check_inspbeyondhtml.fex", "certs")
+    '                FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt", "", True)
+    '                If IncludeCertCheck Then
+    '                End If
 
-                If InStr(wf.GetRequests, "opens") > 1 Then SQLUpdater.OpensUpdater(wf)
-                If InStr(wf.GetRequests, "lots") > 1 Or InStr(wf.GetRequests, "ships") > 1 Then SQLUpdater.UpdateWIP(wf)
-                'FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
-                wf = Nothing
-                Debug.Print("DONE " & Now())
-            End If
+    '                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("OPEN_ORDERS"), Now()) > 60 And True Then
+    '                    If IsNothing(wf) Then wf = wfLogin(wf)
+    '                    wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/custom_open_order_reportshtml.fex", "opens")
+    '                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt", "", True)
+    '                End If
 
-        Catch ex As Exception
-        End Try
-        BusyUpdating = False
-    End Sub
+
+    '                If DateAndTime.DateDiff(DateInterval.Minute, PPForm.GetLastUpdate("SHIPMENTS"), Now()) > 15 And True Then
+    '                    If IsNothing(wf) Then wf = wfLogin(wf)
+    '                    Dim ShipRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23salesshipmen&IBIMR_fex=pprasino/full_shipreport_by_lothtml.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/shipping_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&SHIPPED_D=" & MakeWebfocusDate(PPForm.GetLastUpdate("SHIPMENTS")) & "&IBIMR_random=58708"
+    '                    wf.GetReporthAsync(ShipRef, "ships")
+    '                    FileIO.FileSystem.WriteAllText("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt", "", True)
+    '                End If
+    '                Debug.Print("PULL STARTED" & Now)
+    '                If IsNothing(wf) Then Exit Sub
+
+    '                Do Until InStr(wf.GetRequests, "WaitingForActivation") = 0
+    '                    Debug.Print(wf.GetRequests)
+    '                    Threading.Thread.Sleep(50000)
+    '                Loop
+    '                Debug.Print("STARTED " & Now())
+
+    '                If InStr(wf.GetRequests, "opens") > 1 Then SQLUpdater.OpensUpdater(wf)
+    '                If InStr(wf.GetRequests, "lots") > 1 Or InStr(wf.GetRequests, "ships") > 1 Then SQLUpdater.UpdateWIP(wf)
+    '                FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
+    '                wf = Nothing
+    '                Debug.Print("DONE " & Now())
+    '            End If
+
+    '    Catch ex As Exception
+    '    End Try
+    '    BusyUpdating = False
+    'End Sub
 
 
 
@@ -318,7 +319,7 @@ Public Class class1
 
         Cursor.Current = Cursors.WaitCursor
         If wf.IsLoggedIn Then
-            Debug.Print(ref)
+            'Debug.Print(ref)
             j = wf.GetReporth(ref, 10000)
         End If
 
@@ -439,3 +440,40 @@ Friend NotInheritable Class NativeMethods
 
 End Class
 
+
+
+
+Public Class GetDotNetVersion
+    Public Shared Function Get45PlusFromRegistry() As String
+        Const subkey As String = "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"
+        Using ndpKey As RegistryKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey)
+            If ndpKey IsNot Nothing AndAlso ndpKey.GetValue("Release") IsNot Nothing Then
+                Console.WriteLine(".NET Framework Version: " + CheckFor45PlusVersion(ndpKey.GetValue("Release")))
+                Return ndpKey.GetValue("Release").ToString
+            Else
+                Console.WriteLine(".NET Framework Version 4.5 or later is not detected.")
+                Return " "
+            End If
+        End Using
+    End Function
+
+    ' Checking the version using >= will enable forward compatibility.
+    Private Shared Function CheckFor45PlusVersion(releaseKey As Integer) As String
+        If releaseKey >= 394802 Then
+            Return "4.6.2 or later"
+        ElseIf releaseKey >= 394254 Then
+            Return "4.6.1"
+        ElseIf releaseKey >= 393295 Then
+            Return "4.6"
+        ElseIf releaseKey >= 379893 Then
+            Return "4.5.2"
+        ElseIf releaseKey >= 378675 Then
+            Return "4.5.1"
+        ElseIf releaseKey >= 378389 Then
+            Return "4.5"
+        End If
+        ' This code should never execute. A non-null release key should mean
+        ' that 4.5 or later is installed.
+        Return "No 4.5 or later version detected"
+    End Function
+End Class

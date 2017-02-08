@@ -85,7 +85,8 @@ Namespace My
                 Return CType(Me("ShipmentsColumnOrder"),Global.System.Collections.Specialized.StringCollection)
             End Get
             Set
-                Me("ShipmentsColumnOrder") = value
+
+                Me("ShipmentsColumnOrder") = Value
             End Set
         End Property
         

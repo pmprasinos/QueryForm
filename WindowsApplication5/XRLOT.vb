@@ -31,12 +31,12 @@ Public Class XRLOT
         RemoveHandler Me.ShowDetail.CheckedChanged, AddressOf ShowDetail_CheckedChanged
         SHOWLOTS.Checked = My.Settings.ShowWIPLots
 
-        objConn = New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; persist security info=False; trusted_connection=Yes;")
+        objConn = New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-; Connection Timeout = 3;")
         XRLotDataAdapter.SelectCommand = New SqlClient.SqlCommand
         XRLotDataAdapter.SelectCommand.Connection = objConn
         AlloyDataAdapter.SelectCommand = New SqlClient.SqlCommand
         AlloyDataAdapter.SelectCommand.Connection = objConn
-        Debug.Print(Now)
+
 
         'objConn.ConnectionString = "Server=SLREPORT01; Database=WFLocal; persist security info=False; trusted_connection=Yes;"
 
@@ -68,13 +68,13 @@ Public Class XRLOT
             '  .Columns("HARDNESS_ML_RESULTS").Width = 100
 
         End With
-        Debug.Print(Now)
+
         If My.Settings.UpgradeSettings Then
             My.Settings.UpgradeSettings = False
             My.Settings.Upgrade()
             My.Settings.Save()
         End If
-        Debug.Print(Now)
+
 
 
         DataGridView1.DataSource = XRLottable
@@ -83,7 +83,7 @@ Public Class XRLOT
         'VISLOTSTableAdapter.ClearBeforeFill = True
 
         If SHOWLOTS.Checked Then CheckBoxWCSum.Visible = False
-        Debug.Print(Now)
+
         ' SHOWLOTS.Checked = True
         AddHandler Me.SHOWLOTS.CheckedChanged, AddressOf SHOWLOTS_CheckedChanged
         AddHandler Me.ShowDetail.CheckedChanged, AddressOf ShowDetail_CheckedChanged
@@ -103,9 +103,8 @@ Public Class XRLOT
 
 
 
-    Sub UPDATEQUERYXR()
+    Public Sub UPDATEQUERYXR()
         Dim t As Date = Now
-        Debug.Print("NOW")
 
         RemoveHandler Me.DataGridView1.SelectionChanged, AddressOf Me.DataGridView1_SelectionChanged
         ' Me.SOLinesDataSet.Clear()
@@ -114,7 +113,7 @@ Public Class XRLOT
         If (InStr(TextBox1.Text, "Q") Or InStr(TextBox1.Text, "q0")) And Not ((InStr(TextBox1.Text, "Q0")) Or InStr(TextBox1.Text, "q0")) Then TextBox1.Text = Replace(TextBox1.Text, "Q", "Q0")
         If Len(TextBox1.Text) = 4 Then TextBox1.Text = "0" & TextBox1.Text
         Try
-            If PPForm.currentxrlookup <> TextBox1.Text Then
+            If PPForm.currentxrlookup <> Me.TextBox1.Text Then
                 PPForm.alloy = "ALLOY: " & AlloysQuery(0, TextBox1.Text)
 
                 TextBox2.Text = PPForm.alloy
@@ -134,8 +133,8 @@ Public Class XRLOT
 
         Catch
         End Try
-        TextBox2.Text = PPForm.alloy
-        Debug.Print((Now - t).ToString)
+        Me.TextBox2.Text = PPForm.alloy
+        ' Debug.Print((Now - t).ToString)
         Dim s As String = ""
         s = TextBox1.Text
         Dim f As Integer
@@ -149,9 +148,9 @@ Public Class XRLOT
             Else
                 FillLots(1, s)
             End If
-            Debug.Print("trav" & (Now - t).ToString)
+            ' Debug.Print("trav" & (Now - t).ToString)
             Try : CheckTravlers() : Catch : End Try
-            Debug.Print((Now - t).ToString)
+            'Debug.Print((Now - t).ToString)
         Else
             '    Try
             If CheckBoxWCSum.Checked Then
@@ -164,9 +163,9 @@ Public Class XRLOT
 
 
         End If
-        Debug.Print((Now - t).ToString)
+        'Debug.Print((Now - t).ToString)
         HyperLinkFonts()
-        Debug.Print((Now - t).ToString)
+        'Debug.Print((Now - t).ToString)
         ' Me.Show()
         'If DataGridView1.SortOrder.ToString <> "none" Then
         'DataGridView1.Sort(DataGridView1.SortedColumn, DataGridView1.SortOrder - 1)

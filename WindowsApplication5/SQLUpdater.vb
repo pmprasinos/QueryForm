@@ -13,105 +13,14 @@ Module SQLUpdater
     Private Downloading As Boolean = False
     Dim LogInInfo As String()
     Dim Fuckups As Integer = 0
-    Dim ConnectionString As String = "Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-;"
+    Dim ConnectionString As String = "Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-;Connection Timeout = 3;"
     Private tmp = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\test.temp" 'O.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "snafu.fubar")
     Public TimeToDownload As String
     Public StartTime As String
 
 
 
-    Sub Main()
-        Try
 
-            NotificationEmails()
-
-            Dim t As Date = Now
-            Dim afterdate As String
-            Dim beforedate As String = MakeWebfocusDate(Today.AddDays(1))
-            Dim Dayrange As String = Today
-
-            Dim wf As New WebfocusModule
-            wf = wfLogin(wf)
-
-            afterdate = MakeWebfocusDate(Today.AddDays(-50))
-
-
-            Dim ScrapRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23scrapdatatqg&IBIMR_fex=pprasino/scrap_report.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/scrap_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&DISP_D=" & afterdate & "&LEDISP_D=" & beforedate & "&IBIMR_random=96021"
-            ScrapRef = Replace(ScrapRef, "&IBIMR_sub_action=MR_MY_REPORT", LogInInfo(2))
-
-            beforedate = MakeWebfocusDate(Today.AddDays(1))
-            If Hour(Now) < 3 Or Hour(Now) = 10 Then
-                afterdate = MakeWebfocusDate(Today.AddDays(-10))
-            Else
-                afterdate = MakeWebfocusDate(Today.AddDays(-4))
-            End If
-
-            Dim ShipRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23salesshipmen&IBIMR_fex=pprasino/full_shipreport_by_lothtml.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/shipping_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&SHIPPED_D=" & afterdate & "&IBIMR_random=58708"
-            ShipRef = Replace(ShipRef, "&IBIMR_sub_action=MR_MY_REPORT", LogInInfo(2))
-            Dim TputRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23thruputrepor&IBIMR_fex=pprasino/esh_and_tput_for_flex_for_sql.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/thruput_detail_data.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&TP_DATE_COMPELTED=" & afterdate & "&LE_TP_DATE_COMPELTED=" & beforedate & "&IBIMR_random=31846"
-            TputRef = Replace(TputRef, "&IBIMR_sub_action=MR_MY_REPORT", LogInInfo(2))
-            Dim LaborRef As String = "http://opsfocus01:8080/ibi_apps/Controller?WORP_REQUEST_TYPE=WORP_LAUNCH_CGI&IBIMR_action=MR_RUN_FEX&IBIMR_domain=qavistes/qavistes.htm&IBIMR_folder=qavistes/qavistes.htm%23laborreporti&IBIMR_fex=pprasino/labor_part_detail_workorders_with_esh_for_sql_for_testing.fex&IBIMR_flags=myreport%2CinfoAssist%2Creport%2Croname%3Dqavistes/mrv/labor_part_detail_workorders_with_esh.fex%2CisFex%3Dtrue%2CrunPowerPoint%3Dtrue&IBIMR_sub_action=MR_MY_REPORT&WORP_MRU=true&&WORP_MPV=ab_gbv&GECHARGE_DATE=" & afterdate & "&LECHARGE_DATE=" & beforedate & "&IBIMR_random=24311&"
-            LaborRef = Replace(LaborRef, "&IBIMR_sub_action=MR_MY_REPORT", LogInInfo(2))
-
-            If Hour(Now) = 6 And Minute(Now) = 40 Then
-                FullUpdate(wf)
-            End If
-
-            Debug.Print(TputRef)
-            'console.WriteLine("Started at " & Now)
-
-            wf.GetReporthAsync(ShipRef, "ships")
-
-            Dim RespNames() As String
-
-            If Hour(Now) = 21 And Minute(Now) < 10 Then
-                wf.GetReporthAsync("qavistes/qavistes.htm#routingandpa", "pprasinos:pprasino/ltsshtml.fex", "xtl")
-                wf.GetReporthAsync("qavistes/qavistes.htm#routingandpa", "pprasinos:pprasino/allloy_part_data.fex", "partdata")
-                'console.WriteLine("Pulling  WIP, Fingoods, Certs, Shipments, and  Timelines")
-                'My.Settings.LASTCERTPULL = Now
-
-            ElseIf Minute(Now) < 20 Then
-                'console.WriteLine("Pulling Opens, LabData, Fingoods, WIP and Shipments")
-                wf.GetReporthAsync("qavistes/qavistes.htm#certificateo", "pprasinos:pprasino/sl_wipfg_quality_check_inspbeyondhtml.fex", "certs")
-                wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/custom_open_order_reportshtml.fex", "opens")
-                wf.GetReporthAsync(ScrapRef, "scrap")
-
-                OpensUpdater(wf)
-            ElseIf Minute(Now) < 30 Then
-                'console.WriteLine("Pulling  WIP, Fingoods, Shipments, Tput, labor, and Opens")
-                wf.GetReporthAsync(TputRef, "tput")
-                ' My.Settings.LASTCERTPULL = Now
-                ' My.Settings.LASTOPENPULL = Now
-                '  If Hour(Now) = 1 Or Hour(Now) = 20 Then
-                wf.GetReporthAsync(LaborRef, "labor")
-            End If
-            wf.GetReporthAsync("qavistes/qavistes.htm#wipandshopco", "pprasinos:pprasino/customlotshtml.fex", "lots")
-            wf.GetReporthAsync("qavistes/qavistes.htm#salesshipmen", "pprasinos:pprasino/fingoodshtml.fex", "fingoods")
-
-            'My.Settings.LASTSHIPMENTPULL = Now
-
-            UpdateAppend(wf, GetWFIds(wf.GetRequests))
-
-            ' My.Settings.Save()
-
-            'console.WriteLine("Lots Done in " & (Now - t).ToString)
-            'console.WriteLine(Now - t)
-            Threading.Thread.Sleep(20000)
-            Exit Sub
-emailerror:
-            Fuckups = Fuckups + 1
-            If Fuckups < 5 Then
-                Threading.Thread.Sleep(1000)
-
-            Else
-                'LocalLib.EmailTools.EmailFile({"pprasinos@pccstructurals.com"}, "An error happened in SQLPublisher on line " & Err.Erl, "ErrorReport")
-            End If
-        Catch ex As Exception
-            MsgBox("error")
-            Threading.Thread.Sleep(10000000)
-        End Try
-
-    End Sub
 
     Public Function UpdateShipments(AfterDT As Date)
         Dim AfterDate As String = MakeWebfocusDate(AfterDT)
@@ -122,25 +31,37 @@ emailerror:
     End Function
 
 
-    Public Function UpdateWIP(WF As WebfocusModule)
-        UpdateAppend(WF, GetWFIds(WF.GetRequests))
+    Public Function UpdateWIP(WF As WebfocusModule) As Boolean
+
+        If Not InStr(WF.GetRequests, "cert") > 0 And Not InStr(WF.GetRequests, "tput") Then
+            UpdateAppend(WF, GetWFIds(WF.GetRequests))
+        Else
+            UpdateAppendUsingTables(WF, GetWFIds(WF.GetRequests))
+        End If
+
+
+        Return True
     End Function
 
 
     Public Function UpdateOpens()
         Try
-            If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt") Then
-                If DateDiff(DateInterval.Minute, FileIO.FileSystem.GetFileInfo("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt").LastWriteTime, Now) > 10 Then
-                    FileIO.FileSystem.DeleteFile("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt")
-                End If
+
+
+            If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt") Then
+
+                Debug.Print("LASTWRITE " & DateDiff(DateInterval.Minute, FileIO.FileSystem.GetFileInfo("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt").CreationTime, Now))
+
             Else
-                FileIO.FileSystem.WriteAllText(FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt"), "", True)
+
                 Dim wf As New WebfocusModule
                 wf = wfLogin(wf)
                 OpensUpdater(wf)
             End If
-        Catch : Finally
-            FileIO.FileSystem.DeleteFile(FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE.txt"), False, False)
+        Catch
+
+        Finally
+
         End Try
     End Function
 
@@ -643,6 +564,374 @@ NEXTP:
     End Sub
 
 
+    Public Sub UpdateAppendUsingTables(WF As WebfocusDLL.WebfocusModule, RespNames() As String)
+        'Threading.Thread.Sleep(60000)
+
+
+        Dim RefFind() As String = {"ships", "fingoods", "lots", "certs", "scrap", "partdata", "xtl", "tput", "labor", "labor1", "wiphist", "opens"}
+        Dim TableNames() As String = {"SHIPMENTS", "CERT_ERRORS", "CERT_ERRORS", "CERT_ERRORS", "SCRAP", "ALLOYS", "TIMELINE", "TPUT", "LABOR", "LABOR", "WIP_MOVE_HIST", "OPEN_ORDERS"}
+        Dim UpdatedRows As Integer = 0
+        Using cn As New SqlConnection(ConnectionString)
+            Using cmd As New SqlCommand
+                cmd.Connection = cn
+
+                Dim Query As String
+                Dim TABLES() As String
+                TABLES = TableNames
+
+
+                If InStr(WF.GetRequests, "lots") <> 0 Then
+                    '   cn.Open()
+                    '  cmd.CommandType = CommandType.Text
+                    ' cmd.CommandText = "UPDATE WFLOCAL.DBO.CERT_ERRORS1 SET ACTIVE = 2 WHERE ACTIVE <> 0"
+                    '  cmd.ExecuteNonQuery()
+                    '  cn.Close()
+                End If
+
+                If InStr(WF.GetRequests, "opens") > 0 Then
+                    '   cn.Open()
+                    ' cmd.CommandText = "UPDATE wflocal.dbo.OPEN_ORDERS Set ACTIVE = 2 WHERE ACTIVE <> 0"
+                    ' cmd.ExecuteNonQuery()
+                    '  cn.Close()
+                End If
+
+                For P = 0 To RespNames.Length - 1
+                    If RespNames(P) = Nothing Then GoTo NEXTP
+                    Dim j As New Object
+                    j = WF.GetResponse(RespNames(P)).Response
+                    Dim TableName As String
+                    cn.Open()
+                    Dim e As Integer
+                    Dim t As Boolean
+                    Try
+                        For ind = 0 To RefFind.Length - 1
+                            If RefFind(ind) = RespNames(P) Then TableName = TableNames(ind)
+                        Next
+
+                        Dim SBC As New SqlBulkCopy(cn)
+                        Dim dt As New DataTable
+                        dt.TableName = TableName
+
+                        'console.Write(TableName)
+                        'console.CursorLeft = 0
+                        cmd.CommandType = CommandType.Text
+                        Query = "SELECT column_name, data_type FROM WFLOCAL.INFORMATION_SCHEMA.COLUMNS" & vbCrLf &
+                "WHERE WFLOCAL.INFORMATION_SCHEMA.COLUMNS.TABLE_NAME='" & TableName & "'"
+                        cmd.CommandText = Query
+
+                        Dim ColumnInfo As New List(Of String())
+                        Dim CSVColumns As String = ""
+                        Dim CSVUPDATE As String = ""
+
+                        Using dr As SqlDataReader = cmd.ExecuteReader
+                            Dim K As Integer = 0
+                            Dim ret As Type
+                            While dr.Read()
+                                If InStr(dr("column_name").ToString, "ACTIVE") > 0 Then GoTo SkipColumn
+                                If InStr(dr("data_type").ToString, "char") > 0 Then ret = Type.GetType("system.string", True, True)
+                                If InStr(dr("data_type").ToString, "int") > 0 Then ret = Type.GetType("system.Int32", True, True)
+                                If InStr(dr("data_type").ToString, "fl") > 0 Then ret = Type.GetType("system.double", True, True)
+                                If InStr(dr("data_type").ToString, "date") > 0 Then ret = Type.GetType("system.DateTime", True, True)
+                                'If InStr(dr("data_type").ToString, "time") > 0 Then ret = ret.GetType("system.DateTime", True, True)
+                                If InStr(dr("data_type").ToString, "bit") > 0 Then ret = Type.GetType("system.Boolean", True, True)
+                                dt.Columns.Add(dr("column_name").ToString, ret)
+                                'SBC.ColumnMappings.Add(dt.Columns(dt.Columns.Count - 1).ColumnMapping, K)
+                                SBC.ColumnMappings.Add(dt.Columns(dt.Columns.Count - 1).ColumnName, dr("column_name").ToString)
+SkipColumn:
+                                K = K + 1
+                            End While
+                        End Using
+                        dt.Columns.Add("ACTIVE", Type.GetType("system.Int32", True, True))
+                        SBC.ColumnMappings.Add("ACTIVE", "ACTIVE")
+
+                        'ColumnInfo.Add({"ACTIVE", "int", 0})
+
+                        Dim CT As Long = 1
+                        Dim sw As New Stopwatch
+                        sw.Start()
+
+                        For RowNum = 1 To j.length - 1
+                            Dim dr As DataRow = dt.NewRow()
+                            For Each Col As DataColumn In dt.Columns
+
+                                'Dim k As Object = Col.
+                                Dim d As Int16 = 0
+                                Dim FoundCol As Boolean = False
+                                Do Until FoundCol
+                                    If j(RowNum)(d) = "." Then j(0)(d) = vbNull
+                                    If Col.ColumnName = "EXT_VALUE" And j(0)(d) = "Field14" Then FoundCol = True
+
+                                    If Col.ColumnName = j(0)(d) Then FoundCol = True
+                                    If Col.ColumnName = "SHIPPED_DATE" And j(0)(d) = "SHIPPED_DTIME" Then FoundCol = True
+
+                                    If Not FoundCol Then d = d + 1
+                                    If d = j(0).length - 1 Or FoundCol Then
+
+                                        ' If Col.ColumnName = "PART_STATUS" And Len(j(RowNum)(d)) > 2 And d <> 21 Then Stop
+                                        ' If Col.ColumnName = "LINE_STATUS" And Len(j(RowNum)(d)) > 2 And d <> 21 Then Stop
+                                        '  If Col.ColumnName = "PO_RECEIVED" And Len(j(RowNum)(d)) > 2 And d <> 21 Then Stop
+                                        ' If Col.ColumnName = "SALESORDER_TYPE" And Len(j(RowNum)(d)) > 2 And d <> 21 Then Stop
+                                        '  If Col.ColumnName = "LINE_TYPE" And Len(j(RowNum)(d)) > 2 And d <> 21 Then Stop
+
+                                        'Debug.Print(Col.ColumnName & "   " & Col.DataType.ToString)
+                                        If Col.ColumnName = "SCANNED" Then
+
+                                        ElseIf Col.ColumnName = "ACTIVE" Then
+                                            dr(Col) = 1
+                                        ElseIf FoundCol = True Then
+
+                                            dr(Col) = j(RowNum)(d)
+                                        Else
+                                            'Debug.Print(Col.ColumnName)
+                                        End If
+                                        FoundCol = True
+                                    End If
+                                Loop
+                            Next Col
+                            dt.Rows.Add(dr)
+                            CT = CT + 1
+                        Next RowNum
+                        Debug.Print("LOCAL TABLE GENERATED IN " & (sw.ElapsedMilliseconds / 1000) & " SECONDS")
+                        sw.Restart()
+                        Dim OrigTable As New DataTable
+                        If TableName = "SHIPMENTS" Then
+
+                            cmd.CommandText = "DELETE FROM WFLOCAL..TEMPSHIPMENTS"
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+
+                            SBC.BulkCopyTimeout = 10
+                            SBC.DestinationTableName = "WFLOCAL..TEMPSHIPMENTS"
+
+
+                            SBC.WriteToServer(dt)
+                            cmd.CommandText = "INSERT WFLOCAL..SHIPMENTS
+                                            Select  * FROM TEMPSHIPMENTS WHERE NOT EXISTS(SELECT * FROM WFLOCAL..SHIPMENTS 
+                                            WHERE SHIPMENTS.WORKORDERNO = TEMPSHIPMENTS.WORKORDERNO 
+                                            AND SHIPMENTS.SHIPPED_DTIME=TEMPSHIPMENTS.SHIPPED_DTIME 
+                                            AND SHIPMENTS.INVOICE_NO = TEMPSHIPMENTS.INVOICE_NO);"
+
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+                            cmd.CommandText = "update wflocal..shipments Set shipped_dtime = getdate() where invoice_no = 'PACK(1).pdf' "
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+
+
+                        ElseIf TableName = "OPEN_ORDERS" Then
+
+                            SBC.BulkCopyTimeout = 10
+                            SBC.DestinationTableName = "WFLOCAL..TEMPOPENS"
+                            cmd.CommandText = "DELETE FROM " & SBC.DestinationTableName
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+                            SBC.WriteToServer(dt)
+                            cmd.CommandText = "MERGE WFLOCAL..OPEN_ORDERS1 AS T
+                                                USING WFLOCAL..TEMPOPENS AS S
+                                                ON T.SALES_ORDER_NO = S.SALES_ORDER_NO AND T.ORDER_LINE=S.ORDER_LINE
+
+                                                WHEN NOT MATCHED BY TARGET 
+		                                                THEN INSERT(ADDED_BY, SALES_ORDER_NO , ORDER_LINE , LINE_TYPE , PARTNO , QTY_DUE , RELEASE_PRICE , QTY_SHIPPED , CUSTOMER_PARTNO, 
+					                                                CUSTOMER_PO_NO, CUST_ORDER_LINE , CUSTOMER_NO , COMPANY_NAME , LEADTIME , DUE_VALUE , REQUIRED_D , SCHED_D , 
+					                                                SALESORDER_STATUS ,  PART_STATUS , LINE_STATUS , PO_RECEIVED, SHIP_CONDITION, CUSTOMER_STATUS , 
+					                                                Z91_PSEUDO_DRAWING , Z91_REF_PARTNO , PART_DESCR , SALES_COMMENTS, ACTIVE)
+
+		                                                VALUES(UPPER(S.ADDED_BY), S.SALES_ORDER_NO , S.ORDER_LINE , S.LINE_TYPE , S.PARTNO , S.QTY_DUE , S.RELEASE_PRICE , S.QTY_SHIPPED , 
+			                                                    S.CUSTOMER_PARTNO , S.CUSTOMER_PO_NO , S.CUST_ORDER_LINE , S.CUSTOMER_NO , S.COMPANY_NAME , S.LEADTIME , 
+			                                                    S.DUE_VALUE , S.REQUIRED_D , S.SCHED_D , S.SALESORDER_STATUS ,  S.PART_STATUS , 
+			                                                    S.LINE_STATUS , S.PO_RECEIVED , S.SHIP_CONDITION , S.CUSTOMER_STATUS , S.Z91_PSEUDO_DRAWING , 
+			                                                    S.Z91_REF_PARTNO , S.PART_DESCR , S.SALES_COMMENTS, 1)
+                                                WHEN MATCHED 
+                                                    THEN UPDATE	SET 
+                                                        LINE_TYPE = ISNULL(S.LINE_TYPE,T.LINE_TYPE),
+                                                        PARTNO = S.PARTNO,
+                                                        QTY_DUE = S.QTY_DUE,
+                                                        RELEASE_PRICE = S.RELEASE_PRICE,
+                                                        QTY_SHIPPED = S.QTY_SHIPPED,
+                                                        CUSTOMER_PARTNO = ISNULL(S.CUSTOMER_PARTNO,T.CUSTOMER_PARTNO),
+                                                        CUSTOMER_PO_NO = ISNULL(S.CUSTOMER_PO_NO,T.CUSTOMER_PO_NO),
+                                                        CUST_ORDER_LINE = ISNULL(S.CUST_ORDER_LINE,T.CUST_ORDER_LINE),
+                                                        COMPANY_NAME = ISNULL(S.COMPANY_NAME,T.COMPANY_NAME),
+                                                        LEADTIME = ISNULL(S.LEADTIME,T.LEADTIME),
+                                                        DUE_VALUE = ISNULL(S.DUE_VALUE,T.DUE_VALUE),
+                                                        REQUIRED_D = ISNULL(S.REQUIRED_D,T.REQUIRED_D),
+                                                        SCHED_D = ISNULL(S.SCHED_D,T.SCHED_D),
+                                                        SALESORDER_STATUS = ISNULL(S.SALESORDER_STATUS,T.SALESORDER_STATUS),
+                                                        PART_STATUS = ISNULL(S.PART_STATUS,T.PART_STATUS),
+                                                        LINE_STATUS = ISNULL(S.LINE_STATUS,T.LINE_STATUS),
+                                                        PO_RECEIVED = ISNULL(S.PO_RECEIVED,T.PO_RECEIVED),
+                                                        SHIP_CONDITION = ISNULL(S.SHIP_CONDITION,T.SHIP_CONDITION),
+                                                        CUSTOMER_STATUS = ISNULL(S.CUSTOMER_STATUS,T.CUSTOMER_STATUS),
+                                                        Z91_PSEUDO_DRAWING = ISNULL(S.Z91_PSEUDO_DRAWING,T.Z91_PSEUDO_DRAWING),
+                                                        Z91_REF_PARTNO = ISNULL(S.Z91_REF_PARTNO,T.Z91_REF_PARTNO),
+                                                        PART_DESCR = ISNULL(S.PART_DESCR,T.PART_DESCR),
+                                                        SALES_COMMENTS = ISNULL(S.SALES_COMMENTS,T.SALES_COMMENTS),
+                                                        ACTIVE=1
+                                                WHEN NOT MATCHED BY SOURCE
+                                                    THEN UPDATE SET 
+                                                        ACTIVE = 0;"
+
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+
+                            ' cmd.CommandText = "UPDATE wflocal.dbo.OPEN_ORDERS1 SET ACTIVE = 0 WHERE ACTIVE = 2"
+                            ' ExecuteSqlNonQueryTransaction(cmd, cn)
+                            cmd.CommandText = "INSERT INTO WFLOCAL.DBO.PO_REVIEW  (SALES_ORDER_NO, CUST_NO, SALES, USERNAME, ttimestamp, prel, pship, erel, eship)" & vbCrLf &
+                                        "Select DISTINCT B.SALES_ORDER_NO, B.CUSTOMER_NO, B.ADDED_BY, B.ADDED_BY, getdate(), 1, 1, 1, 1" & vbCrLf &
+                                        "From DBO.OPEN_ORDERS1 B" & vbCrLf &
+                                        "Where Not EXISTS(SELECT distinct  B.SALES_ORDER_NO" & vbCrLf &
+                                        "From DBO.PO_REVIEW" & vbCrLf &
+                                        "Where PO_REVIEW.SALES_ORDER_NO = B.SALES_ORDER_NO" & vbCrLf &
+                                        ")" & vbCrLf &
+                                        "" & vbCrLf
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+                            cmd.Parameters.Clear()
+                            cmd.CommandType = CommandType.StoredProcedure
+                            cmd.CommandText = "wflocal.dbo.CleanTickets"
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+
+
+                        ElseIf TableName = "CERT_ERRORS" Then
+
+                            cmd.CommandText = "DELETE FROM WFLOCAL..TEMPWIP"
+                                ExecuteSqlNonQueryTransaction(cmd, cn)
+
+                            ' cmd.ExecuteNonQuery()
+
+                            SBC.BulkCopyTimeout = 10
+                                SBC.DestinationTableName = "WFLOCAL..TEMPWIP"
+
+                            '    Debug.Print(Now)
+                            'cmd.ExecuteNonQuery()
+                            SBC.WriteToServer(dt)
+                            Dim extrastring As String = ")"
+
+                            If P = 1 Then extrastring = "AND S.WC_DESCR = T.WC_DESCR)"
+                            cmd.CommandText = "MERGE WFLOCAL.DBO.CERT_ERRORS1 AS T
+	                                            USING (SELECT DISTINCT WORKORDERNO,	SUM(QTY) AS ORDERSTATUS,	METALLOT,	STOPWORK,	MRB_OK_TO_SHIP,	SHIP_HOLD,	WORKCENTER,	max(WC_DESCR) as WC_DESCR,	LOT_TYPE,	SELLING_PRICE,	PARTNO,	
+			                                                  OPERATION,	SUM(QTY) AS QTY,	SCHEDULE_PRI_N,	OPER_DESC,	1 as ACTIVE,	MILESTONE,	MAX(DAYS_IN_WC) AS DAYS_IN_WC,	LAST_LABOR_CHG_D,	ACCUM_STD_VALUE,	HOURS_IN_OPER
+			                                            FROM WFLOCAL..TEMPWIP 
+				                                        GROUP BY WORKORDERNO,	METALLOT,	STOPWORK,	MRB_OK_TO_SHIP,	SHIP_HOLD,	WORKCENTER,		LOT_TYPE,	SELLING_PRICE,	PARTNO,	
+			                                                     OPERATION,	SCHEDULE_PRI_N,	OPER_DESC, ACTIVE,	MILESTONE,	LAST_LABOR_CHG_D,	ACCUM_STD_VALUE,	HOURS_IN_OPER
+		                                               ) AS S
+	                                            ON (T.WORKORDERNO = S.WORKORDERNO " & EXTRASTRING & " 
+
+                                                WHEN NOT MATCHED BY TARGET
+		                                            THEN INSERT(HOURS_IN_OPER, PARTNO, WORKORDERNO, ORDERSTATUS, METALLOT, STOPWORK, MRB_OK_TO_SHIP, SHIP_HOLD, WORKCENTER, OPERATION, OPER_DESC, WC_DESCR, 
+			                                             LOT_TYPE, SELLING_PRICE, QTY, MILESTONE, ACTIVE, SCHEDULE_PRI_N, LAST_LABOR_CHG_D, ACCUM_STD_VALUE)
+
+		                                                VALUES(S.HOURS_IN_OPER, S.PARTNO, S.WORKORDERNO, S.ORDERSTATUS, S.METALLOT, S.STOPWORK, S.MRB_OK_TO_SHIP, S.SHIP_HOLD, S.WORKCENTER, 
+		                                                S.OPERATION, S.OPER_DESC, S.WC_DESCR, S.LOT_TYPE, S.SELLING_PRICE, S.QTY, S.MILESTONE, 
+		                                                S.ACTIVE, S.SCHEDULE_PRI_N, S.LAST_LABOR_CHG_D, S.ACCUM_STD_VALUE)
+
+	                                            WHEN MATCHED 
+		                                            THEN UPDATE SET	
+			                                            HOURS_IN_OPER=S.HOURS_IN_OPER,
+			                                            ORDERSTATUS = ISNULL(S.ORDERSTATUS,T.ORDERSTATUS),
+			                                            PARTNO = ISNULL(S.PARTNO,T.PARTNO),
+			                                            METALLOT = ISNULL(S.METALLOT,T.METALLOT),
+			                                            STOPWORK = ISNULL(S.STOPWORK,T.STOPWORK),
+			                                            MRB_OK_TO_SHIP = ISNULL(S.MRB_OK_TO_SHIP,T.MRB_OK_TO_SHIP),
+			                                            SHIP_HOLD = ISNULL(S.SHIP_HOLD,T.SHIP_HOLD),
+			                                            WORKCENTER = ISNULL(S.WORKCENTER,T.WORKCENTER),
+			                                            OPERATION = ISNULL(S.OPERATION,T.OPERATION),
+			                                            WC_DESCR = ISNULL(S.WC_DESCR, T.WC_DESCR),
+			                                            OPER_DESC = ISNULL(S.OPER_DESC, T.OPER_DESC),
+			                                            LOT_TYPE  = ISNULL(S.LOT_TYPE, T.LOT_TYPE),
+			                                            SELLING_PRICE  = ISNULL(S.SELLING_PRICE,T.SELLING_PRICE),
+			                                            DAYS_IN_WC  = ISNULL(S.DAYS_IN_WC ,T.DAYS_IN_WC ),
+			                                            QTY=ISNULL(S.QTY, T.QTY),
+			                                            MILESTONE=ISNULL(S.MILESTONE, CASE WHEN T.OPERATION>9998 THEN 13 ELSE T.MILESTONE END),
+			                                            SCHEDULE_PRI_N = ISNULL(S.SCHEDULE_PRI_N, T.SCHEDULE_PRI_N),
+			                                            LAST_LABOR_CHG_D=ISNULL(S.LAST_LABOR_CHG_D, T.LAST_LABOR_CHG_D),
+			                                            ACCUM_STD_VALUE=ISNULL(S.ACCUM_STD_VALUE, T.ACCUM_STD_VALUE),
+			                                            ACTIVE = 1
+	                                            WHEN NOT MATCHED BY SOURCE AND ACTIVE <> 1
+			                                            THEN UPDATE SET ACTIVE = 2;"
+
+                            ExecuteSqlNonQueryTransaction(cmd, cn)
+
+
+                            'cmd.ExecuteNonQuery()
+
+                            ' Debug.Print(Now)
+                        End If
+
+                            Debug.Print(SBC.DestinationTableName & " MERGED WITH " & TableName & " USING " & RespNames(P) & " IN " & (sw.ElapsedMilliseconds / 1000) & " SECONDS")
+                        sw.Restart()
+                        ''console.CursorLeft = 20
+                        ''console.WriteLine(TableName & " UPDATED Using " & RespNames(P))
+
+
+                        'cmd.CommandText = "WFLOCAL.DBO.AddShipments"
+                        'ElseIf TableName = "TPUT" Then
+                        'cmd.CommandText = "WFLOCAL.DBO.UpdateThruput"
+                        'ElseIf TableName = "LABOR" Then
+                        'cmd.CommandText = "WFLOCAL.DBO.UpdateLabor"
+                        'ElseIf TableName = "WIP_MOVE_HIST" Then
+                        'cmd.CommandText = "WFLOCAL.DBO.UPDATE_WIP_HIST"
+
+                    Catch ex As Exception
+                        MsgBox(j & "    " & t & "     " & ex.Message.ToString)
+                    Finally
+                        cn.Close()
+                    End Try
+                    '  'console.WriteLine("  (" & UpdatedRows & " Rows Updated)")
+NEXTP:
+                Next P
+
+                cmd.CommandType = CommandType.Text
+                If InStr(WF.GetRequests, "lots") <> 0 Then
+                    cn.Open()
+                    cmd.CommandText = "UPDATE WFLOCAL.DBO.CERT_ERRORS1 Set ACTIVE = 0 WHERE ACTIVE = 2"
+                    'Dim RWS As Integer = cmd.ExecuteNonQuery()
+                    '    If RWS <> -1 Then Stop
+                    '       UpdatedRows = UpdatedRows + RWS
+                    '   
+                    ExecuteSqlNonQueryTransaction(cmd, cn)
+                    cmd.CommandType = CommandType.StoredProcedure
+                    cmd.CommandText = "wflocal..cleanup"
+                    cmd.Parameters.Clear()
+                    ExecuteSqlNonQueryTransaction(cmd, cn)
+                    cn.Close()
+                End If
+
+                If InStr(WF.GetRequests, "ships") > 0 Then
+
+
+                End If
+                If InStr(WF.GetRequests, "opens") > 0 Then
+
+
+                End If
+
+            End Using
+
+        End Using
+        ' PPForm.Text = "PLEASE WAIT, UPDATING TABLES...DONE"
+    End Sub
+
+    Private Sub ExecuteSqlNonQueryTransaction(ByRef cmd As SqlCommand, cn As SqlConnection)
+        Dim Trans As SqlTransaction
+        Trans = cn.BeginTransaction()
+        cmd.Transaction = Trans
+        Try
+            Dim t As Integer = cmd.ExecuteNonQuery()
+            Debug.Print(t & " rows affected")
+            Trans.Commit()
+            'Console.WriteLine("Transaction Committed")
+        Catch ex As Exception
+            MsgBox("Commit Exception Type: {0}", ex.GetType().ToString)
+            MsgBox("  Message: {0}", ex.Message)
+            ' Attempt to roll back the transaction. 
+            Try
+                Trans.Rollback()
+            Catch ex2 As Exception
+                ' This catch block will handle any errors that may have occurred 
+                ' on the server that would cause the rollback to fail, such as 
+                ' a closed connection.
+                MsgBox("Rollback Exception Type: {0}", ex2.GetType().ToString)
+                MsgBox("  Message: {0}", ex2.Message)
+            End Try
+
+        End Try
+    End Sub
+
     Sub OpensUpdater(wf As WebfocusModule)
 
         Dim cdataset As New DataSet
@@ -657,10 +946,10 @@ NEXTP:
                 Dim Query As String = "UPDATE wflocal.dbo.OPEN_ORDERS Set ACTIVE = 2 WHERE ACTIVE <> 0"
                 cmd.CommandText = Query
                 cmd.ExecuteNonQuery()
-                If Hour(Now) = 20 Then
-                    cmd.CommandText = "DELETE FROM WFLOCAL.DBO.OPEN_ORDERS WHERE ACTIVE =2"
-                    cmd.ExecuteNonQuery()
-                End If
+                'If Hour(Now) = 20 Then
+                ' cmd.CommandText = "DELETE FROM WFLOCAL.DBO.OPEN_ORDERS WHERE ACTIVE =2"
+                'cmd.ExecuteNonQuery()
+                'End If
 
                 Query = "Select column_name, data_type FROM WFLOCAL.INFORMATION_SCHEMA.COLUMNS" & vbCrLf &
                     "WHERE WFLOCAL.INFORMATION_SCHEMA.COLUMNS.TABLE_NAME='OPEN_ORDERS'"

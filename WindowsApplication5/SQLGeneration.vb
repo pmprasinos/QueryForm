@@ -37,7 +37,7 @@ Public Class SQLGenerator
                     Dim ShipHold As Integer = CInt(RD("SSHIP")) + CInt(RD("QSHIP")) + CInt(RD("PSHIP")) + CInt(RD("ESHIP"))
 
 
-                    Debug.Print(PPForm.TabControl1.TabPages.Count)
+                    'Debug.Print(PPForm.TabControl1.TabPages.Count)
                     If RelHold + ShipHold <> 0 And PPForm.TabControl1.TabPages.Count <> 3 Then
 
                         PPForm.TabControl1.TabPages.Insert(2, PPForm.TPLIST(0))

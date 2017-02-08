@@ -38,7 +38,7 @@
     <PublisherName>Prasinos</PublisherName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>348</ApplicationRevision>
+    <ApplicationRevision>396</ApplicationRevision>
     <ApplicationVersion>3.4.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -115,7 +115,7 @@
     <WarningLevel>0</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <DefineTrace>false</DefineTrace>
