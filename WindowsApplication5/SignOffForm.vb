@@ -155,7 +155,9 @@ Public Class SignOffForm
                     Loop
                 End If
             End Using
-        Catch : Finally
+        Catch ex As Exception
+            Try : class1.Serialize(PPForm.ExceptionPath, ex) : Catch : End Try
+        Finally
             PPForm.objConnCurr.Close()
             LockChecks = False
         End Try

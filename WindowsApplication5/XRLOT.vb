@@ -113,7 +113,7 @@ Public Class XRLOT
         If (InStr(TextBox1.Text, "Q") Or InStr(TextBox1.Text, "q0")) And Not ((InStr(TextBox1.Text, "Q0")) Or InStr(TextBox1.Text, "q0")) Then TextBox1.Text = Replace(TextBox1.Text, "Q", "Q0")
         If Len(TextBox1.Text) = 4 Then TextBox1.Text = "0" & TextBox1.Text
         Try
-            If PPForm.currentxrlookup <> Me.TextBox1.Text Then
+            If PPForm.currentxrlookup <> TextBox1.Text Then
                 PPForm.alloy = "ALLOY: " & AlloysQuery(0, TextBox1.Text)
 
                 TextBox2.Text = PPForm.alloy
@@ -254,6 +254,7 @@ Public Class XRLOT
 
         Catch ex As Exception
             MsgBox("ERROR IN QUERY" & vbCrLf & vbCrLf & ex.Message.ToString & vbCrLf & vbCrLf & ex.InnerException.ToString)
+            Try : class1.Serialize(PPForm.ExceptionPath, ex) : Catch : End Try
         Finally
 
             objConn.Close()

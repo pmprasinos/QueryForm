@@ -25,13 +25,13 @@
                 PPForm.PSQLArray = j
                 '   Catch ex As Exception
 doitagain:
-                '   FileIO.FileSystem.DeleteFile(My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SalesTrackData\" & Dir(My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SalesTrackData\*"))
-                'If InStr(ex.ToString, "Microsoft.ACE.OLEDB.12.0", CompareMethod.Text) > 0 Then
-                '    MsgBox("An error occured with your system's database enging" & Chr(10) & "Try installing the file: 'S:\PRASINOS\mods\WINDOWSFORMS\AccessDatabaseEngine.exe'" & Chr(10) & Chr(10) & Chr(10) & "See below for exception message:" & Chr(10) & Chr(10) & Chr(10) & ex.Message)
-                'End If
-                '     MsgBox("ERL=" & Err.Erl & Chr(10) & "InnerException=" & ex.ToString & Chr(10) & "Message=" & ex.Message & Chr(10) & "Source=" & ex.Source.ToString)
-                ' End Try
-                My.Settings.Save()
+            '   FileIO.FileSystem.DeleteFile(My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SalesTrackData\" & Dir(My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SalesTrackData\*"))
+            'If InStr(ex.ToString, "Microsoft.ACE.OLEDB.12.0", CompareMethod.Text) > 0 Then
+            '    MsgBox("An error occured with your system's database enging" & Chr(10) & "Try installing the file: 'S:\PRASINOS\mods\WINDOWSFORMS\AccessDatabaseEngine.exe'" & Chr(10) & Chr(10) & Chr(10) & "See below for exception message:" & Chr(10) & Chr(10) & Chr(10) & ex.Message)
+            'End If
+            '     MsgBox("ERL=" & Err.Erl & Chr(10) & "InnerException=" & ex.ToString & Chr(10) & "Message=" & ex.Message & Chr(10) & "Source=" & ex.Source.ToString)
+            ' End Try
+            'My.Settings.Save()
 
         End Sub
 
@@ -42,22 +42,22 @@ tryonemoregain:
 
 
             Try
-                    Dim ThisUserDocs As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments
-                    ThisUserDocs = Replace(ThisUserDocs, "mreyes", "mgonzales")
-                    ' If Not FileIO.FileSystem.DirectoryExists(ThisUserDocs & "\SalesTrackData") Then
-                    ' FileIO.FileSystem.CreateDirectory(ThisUserDocs & "\SalesTrackData")
-                    'End If
+                'Dim ThisUserDocs As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments
+                'ThisUserDocs = Replace(ThisUserDocs, "mreyes", "mgonzales")
+                ' If Not FileIO.FileSystem.DirectoryExists(ThisUserDocs & "\SalesTrackData") Then
+                ' FileIO.FileSystem.CreateDirectory(ThisUserDocs & "\SalesTrackData")
+                'End If
 
-                    ' If Not FileIO.FileSystem.FileExists(ThisUserDocs & "\SalesTrackData\SalesInfo.accdb") Then
-                    ' FileIO.FileSystem.CopyFile("\\SLFS01\shared\prasinos\solines.accdb", ThisUserDocs & "\SalesTrackData\SalesInfo.accdb", True)
-                    'End If
-                    ' If Not FileIO.FileSystem.FileExists(ThisUserDocs & "\SalesTrackData\StaticData.accdb") Then
-                    ' FileIO.FileSystem.CopyFile("\\SLFS01\shared\prasinos\StaticData.accdb", ThisUserDocs & "\SalesTrackData\StaticData.accdb", True)
-                    'End If
+                ' If Not FileIO.FileSystem.FileExists(ThisUserDocs & "\SalesTrackData\SalesInfo.accdb") Then
+                ' FileIO.FileSystem.CopyFile("\\SLFS01\shared\prasinos\solines.accdb", ThisUserDocs & "\SalesTrackData\SalesInfo.accdb", True)
+                'End If
+                ' If Not FileIO.FileSystem.FileExists(ThisUserDocs & "\SalesTrackData\StaticData.accdb") Then
+                ' FileIO.FileSystem.CopyFile("\\SLFS01\shared\prasinos\StaticData.accdb", ThisUserDocs & "\SalesTrackData\StaticData.accdb", True)
+                'End If
 
-                    'PPForm.Text = "Open Orders Search (" & CStr(FileIO.FileSystem.GetFileInfo(ThisUserDocs & "\SalestrackData\Salesinfo.accdb").LastWriteTime.ToString) & ")"
+                'PPForm.Text = "Open Orders Search (" & CStr(FileIO.FileSystem.GetFileInfo(ThisUserDocs & "\SalestrackData\Salesinfo.accdb").LastWriteTime.ToString) & ")"
 
-                Catch ex As Exception
+            Catch ex As Exception
 
                     ' PPForm.Text = PPForm.Text & " OFFLINE"
                 End Try
@@ -73,9 +73,10 @@ tryonemoregain:
                                     FROM WFLOCAL..SHOPS
                                     ORDER BY PARTNO DESC"
             Try
-                If Not My.Computer.Network.Ping("10.60.3.1") Then MsgBox("Server SLREPORT01 is offline. Contact IT.")
+                If Not My.Computer.Network.Ping("10.60.3.14") Then MsgBox("Server SLREPORT01 is offline. Contact IT.")
             Catch ex As Exception
                 MsgBox("Machine does not seem to be on the San Leandro Network. Check your connection and click OK.")
+
             End Try
 
             Dim ShopList As New List(Of String)

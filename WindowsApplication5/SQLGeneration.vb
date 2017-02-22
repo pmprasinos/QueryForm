@@ -59,7 +59,10 @@ notickets:
                 End While
             End Using
 
-        Catch ex As Exception : Finally
+        Catch ex As Exception
+            Try : class1.Serialize(PPForm.ExceptionPath, ex) : Catch : End Try
+
+        Finally
             PPForm.objConnCurr.Close()
 
         End Try

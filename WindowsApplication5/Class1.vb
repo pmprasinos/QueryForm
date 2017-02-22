@@ -9,6 +9,7 @@ Imports System.ComponentModel
 Imports WebfocusDLL
 Imports System.Threading
 Imports Microsoft.Win32
+Imports System.Xml.Serialization
 
 Public Class class1
 
@@ -421,6 +422,15 @@ Public Class class1
 
     'End Sub
 
+    Public Shared Sub Serialize(OutPath As String, obj As Object)
+        Dim bSerializer As New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+        Dim sw As New System.IO.MemoryStream()
+        bSerializer.Serialize(sw, obj)
+        FileIO.FileSystem.WriteAllText(OutPath, vbCrLf & Now() & GetDotNetVersion.Get45PlusFromRegistry & ":", True)
+        FileIO.FileSystem.WriteAllBytes(OutPath, sw.ToArray(), True)
+        sw.Close()
+    End Sub
+
 End Class
 
 
@@ -476,4 +486,41 @@ Public Class GetDotNetVersion
         ' that 4.5 or later is installed.
         Return "No 4.5 or later version detected"
     End Function
+End Class
+
+
+
+<Serializable()> Public Class ErrorClass
+    Inherits Exception
+    Public TimeStamp As DateTime = Nothing
+    Public Message As String = Nothing
+    Public StackTrace As String = Nothing
+
+    Public Sub New()
+        Me.TimeStamp = System.DateTime.Now
+        Me.Message = ""
+        Me.StackTrace = ""
+    End Sub
+
+    Public Sub New(Message As String)
+        Me.Message = Message
+    End Sub
+
+    Public Sub New(ex As Exception)
+        Me.StackTrace = ex.StackTrace
+    End Sub
+
+    Public Overrides Function ToString() As String
+        Return Me.Message + Me.StackTrace
+    End Function
+
+    Public Sub Serialize(OutPath As String)
+        Dim xmlSerializer As New XmlSerializer(GetType(System.Exception))
+        Dim sw As New System.IO.StringWriter
+        xmlSerializer.Serialize(sw, Me)
+        FileIO.FileSystem.WriteAllText(OutPath, sw.ToString(), True)
+    End Sub
+
+
+
 End Class
