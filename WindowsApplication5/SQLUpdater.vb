@@ -19,9 +19,6 @@ Module SQLUpdater
     Public StartTime As String
 
 
-
-
-
     Public Function UpdateShipments(AfterDT As Date)
         Dim AfterDate As String = MakeWebfocusDate(AfterDT)
         Dim wf As New WebfocusModule
@@ -32,20 +29,13 @@ Module SQLUpdater
 
 
     Public Function UpdateWIP(WF As WebfocusModule) As Boolean
-
-
         UpdateAppend(WF, GetWFIds(WF.GetRequests))
-
-
-
-            Return True
+        Return True
     End Function
 
 
     Public Function UpdateOpens()
         Try
-
-
             If FileIO.FileSystem.FileExists("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt") Then
                 Debug.Print("LASTWRITE " & DateDiff(DateInterval.Minute, FileIO.FileSystem.GetFileInfo("\\slfs01\shared\prasinos\8ball\LOCKFILE1.txt").CreationTime, Now))
             Else
@@ -126,7 +116,7 @@ Module SQLUpdater
         Dim PARTLIST As New List(Of String)
         Using cn As New SqlConnection(ConnectionString)
             Using cmd As New SqlCommand
-                cmd.CommandText = "SELECT DISTINCT PARTNO FROM WFLOCAL..CERT_ERRORS WHERE ISNULL(DAYS_IN_WC,49) < 50 AND PARTNO NOT LIKE '%S'"
+                cmd.CommandText = "SELECT DISTINCT PARTNO FROM WFLOCAL..CERT_ERRORS with (NOLOCK) WHERE ISNULL(DAYS_IN_WC,49) < 50 AND PARTNO NOT LIKE '%S'"
                 cmd.Connection = cn
                 cn.Open()
                 Using DR As SqlClient.SqlDataReader = cmd.ExecuteReader
@@ -274,8 +264,8 @@ Module SQLUpdater
 
         Using cn As New SqlConnection(ConnectionString)
             Using cmd As New SqlCommand
-                cmd.CommandText = "select * from wflocal..NOTIFICATIONS a 
-                                    left join wflocal..CERT_ERRORS b
+                cmd.CommandText = "select * from wflocal..NOTIFICATIONS a  
+                                    left join wflocal..CERT_ERRORS b 
                                     on a.WORKORDERNO=b.WORKORDERNO
                                     where a.OPERATIONNO<b.OPERATION
                                    "
@@ -346,8 +336,6 @@ Module SQLUpdater
         'Threading.Thread.Sleep(60000)
         Dim trans As SqlTransaction
 
-
-
         Dim RefFind() As String = {"ships", "fingoods", "lots", "certs", "scrap", "partdata", "xtl", "tput", "labor", "labor1", "wiphist"}
         Dim TableNames() As String = {"SHIPMENTS1", "CERT_ERRORS1", "CERT_ERRORS1", "CERT_ERRORS1", "SCRAP1", "ALLOYS1", "TIMELINE1", "TPUT1", "LABOR1", "LABOR1", "WIP_MOVE_HIST1"}
         Dim UpdatedRows As Integer = 0
@@ -356,10 +344,8 @@ Module SQLUpdater
             Try
                 Using cmd As New SqlCommand("", cn)
                     trans = cn.BeginTransaction(Environment.UserName)
-
                     cmd.Connection = cn
                     cmd.Transaction = trans
-
 
                     Dim Query As String
                     Dim TABLES() As String
@@ -519,20 +505,10 @@ Module SQLUpdater
                             t = False
                             CT = CT + 1
                             PPForm.Text = Split(PPForm.Text & " -- ", " -- ")(0) & " -- (" & CT & "/" & j.length & ") "
-                            ''console.CursorLeft = 0
-                            ''console.Write(CT & "/" & j.length & "       ")
-                            'If RespNames(P) = "labor" Then Threading.Thread.Sleep(10)
-                            '    If RespNames(P) = "tput" Then Threading.Thread.Sleep(10)
+
 
                         Next
-                        ''console.CursorLeft = 20
-                        ''console.WriteLine(TableName & " UPDATED Using " & RespNames(P))
 
-                        ' Catch ex As Exception
-                        ' MsgBox(j & "    " & t & "     " & ex.Message)
-                        ' Finally
-                        ' End Try
-                        '  'console.WriteLine("  (" & UpdatedRows & " Rows Updated)")
 NEXTP:
                     Next P
 
@@ -547,8 +523,6 @@ NEXTP:
                         cmd.CommandText = "wflocal..cleanup1"
                         cmd.Parameters.Clear()
                         cmd.ExecuteNonQuery()
-
-
 
                     End If
                     If InStr(WF.GetRequests, "ships") > 0 Then
@@ -967,8 +941,9 @@ NEXTP:
 
         Dim ConnectionString As String = "Server=SLREPORT01; Database=WFLocal; persist security info=False; trusted_connection=Yes;"
         Using cn As New SqlConnection(ConnectionString)
-            cn.Open()
             Try
+                cn.Open()
+
                 Using cmd As New SqlCommand("", cn)
                     trans = cn.BeginTransaction(Environment.UserName)
                     cmd.Connection = cn
@@ -1050,9 +1025,9 @@ NEXTP:
                     cmd.ExecuteNonQuery()
                     cmd.CommandText = "INSERT INTO WFLOCAL.DBO.PO_REVIEW  (SALES_ORDER_NO, CUST_NO, SALES, USERNAME, ttimestamp, prel, pship, erel, eship)" & vbCrLf &
                                             "Select DISTINCT B.SALES_ORDER_NO, B.CUSTOMER_NO, B.ADDED_BY, B.ADDED_BY, getdate(), 1, 1, 1, 1" & vbCrLf &
-                                            "From DBO.OPEN_ORDERS B" & vbCrLf &
+                                            "From DBO.OPEN_ORDERS B with (NOLOCK)" & vbCrLf &
                                             "Where Not EXISTS(SELECT distinct  B.SALES_ORDER_NO" & vbCrLf &
-                                            "From DBO.PO_REVIEW" & vbCrLf &
+                                            "From DBO.PO_REVIEW with (NOLOCK)" & vbCrLf &
                                             "Where PO_REVIEW.SALES_ORDER_NO = B.SALES_ORDER_NO" & vbCrLf &
                                             ")" & vbCrLf &
                                             "" & vbCrLf
@@ -1071,7 +1046,7 @@ NEXTP:
                 Try : class1.Serialize(PPForm.ExceptionPath, ex) : Catch : End Try
                 ' Attempt to roll back the transaction. 
                 Try
-                    Trans.Rollback()
+                    trans.Rollback()
                 Catch ex2 As Exception
                     ' This catch block will handle any errors that may have occurred 
                     ' on the server that would cause the rollback to fail, such as 

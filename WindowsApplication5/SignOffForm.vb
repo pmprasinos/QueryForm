@@ -10,6 +10,11 @@ Public Class SignOffForm
 
         cmd.Connection = PPForm.objConnCurr
         GetUsersAndNotes()
+
+        For Each C As Control In Me.Controls
+            C.Enabled = True
+        Next C
+
         PullTicketInfo()
         CheckChecks()
         If CheckBoxQualityRel.Checked And CheckBoxQualityShip.Checked And CheckBoxEngRel.Checked And CheckBoxEngShip.Checked And CheckBoxEngRel.Checked And CheckBoxSalesRel.Checked And CheckBoxSalesShip.Checked And CheckBoxProdRel.Checked And CheckBoxProdShip.Checked Then
@@ -17,6 +22,7 @@ Public Class SignOffForm
                 C.Enabled = False
             Next C
         End If
+
         If Not (CheckBoxSalesRel.Checked And CheckBoxSalesShip.Checked And CheckBoxQualityRel.Checked And CheckBoxQualityShip.Checked And CheckBoxEngRel.Checked And CheckBoxEngShip.Checked And CheckBoxProdRel.Checked And CheckBoxProdShip.Checked) Then
             RichTextBox2.Enabled = True
             RichTextBox1.Enabled = True
@@ -60,7 +66,8 @@ Public Class SignOffForm
         PPForm.objConnCurr.Open()
 
         Try
-            Dim role As String = GetRole()
+            Dim role As String = ""
+            role = GetRole()
             If InStr(role, "S") Then
                 CheckBoxProdRel.Enabled = True
                 CheckBoxEngRel.Enabled = True
@@ -82,7 +89,7 @@ Public Class SignOffForm
             End If
 
             cmd.Parameters.Clear()
-            cmd.CommandText = "SELECT ISNULL(username, '') AS USERNAME, ISNULL(ROLE,'') AS ROLE FROM WFLOCAL..USERS WHERE ISNULL(ROLE, '')<>''"
+            cmd.CommandText = "SELECT ISNULL(username, '') AS USERNAME, ISNULL(ROLE,'') AS ROLE FROM WFLOCAL..USERS with (NOLOCK) WHERE ISNULL(ROLE, '')<>''"
 
 
             Using SQR As SqlClient.SqlDataReader = cmd.ExecuteReader
@@ -116,7 +123,7 @@ Public Class SignOffForm
         Try
             cmd.Parameters.Clear()
             cmd.CommandText = "SELECT SALES_ORDER_NO, TTIMESTAMP, USERNAME, CUST_NO, NOTES, QUALITY, ENG, SALES, PROD, ISNULL(QREL, 'FALSE') AS QREL, ISNULL(QSHIP, 'FALSE') AS QSHIP, ISNULL(EREL, 'FALSE') AS EREL, ISNULL(ESHIP, 'FALSE') AS ESHIP, " & vbCrLf &
-                            " ISNULL(SREL, 'FALSE') AS SREL, ISNULL(SSHIP, 'FALSE') AS SSHIP, ISNULL(PREL, 'FALSE') AS PREL, ISNULL(PSHIP, 'FALSE') AS PSHIP FROM WFLOCAL..PO_REVIEW WHERE SALES_ORDER_NO =@SO" & vbCrLf &
+                            " ISNULL(SREL, 'FALSE') AS SREL, ISNULL(SSHIP, 'FALSE') AS SSHIP, ISNULL(PREL, 'FALSE') AS PREL, ISNULL(PSHIP, 'FALSE') AS PSHIP FROM WFLOCAL..PO_REVIEW with (NOLOCK) WHERE SALES_ORDER_NO =@SO" & vbCrLf &
                             "ORDER BY TTIMESTAMP DESC"
 
             If PPForm.TabControl1.SelectedIndex = 0 Then
@@ -148,6 +155,10 @@ Public Class SignOffForm
                             CheckBoxProdRel.Checked = CBool(SQR("PREL").ToString)
                             CheckBoxProdRel.Enabled = Not CBool(SQR("PREL").ToString)
                             CheckBoxProdShip.Checked = CBool(SQR("PSHIP").ToString)
+                            If SQR("SALES") = UCase(Environment.UserName) Then
+                                CheckBoxQualityRel.Enabled = False
+                                CheckBoxQualityShip.Enabled = False
+                            End If
                             CNUM = SQR("CUST_NO").ToString
                             Me.Text = "Sign of Activity for Sales Order: " & SQR("SALES_ORDER_NO").ToString & "Customer: " & SQR("CUST_NO").ToString
                             FIRSTROW = False
@@ -169,7 +180,7 @@ Public Class SignOffForm
     Private Function GetRole() As String
 
         cmd.Parameters.Clear()
-        cmd.CommandText = "SELECT ROLE FROM WFLOCAL..USERS WHERE USERNAME = @USERNAME"
+        cmd.CommandText = "SELECT ROLE FROM WFLOCAL..USERS with (NOLOCK) WHERE USERNAME = @USERNAME"
         cmd.Parameters.AddWithValue("@USERNAME", UCase(Environment.UserName))
         'cmd.Parameters.AddWithValue("@USERNAME", "bkenjale")
 

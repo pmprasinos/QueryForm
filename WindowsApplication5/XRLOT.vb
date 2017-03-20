@@ -189,7 +189,7 @@ Public Class XRLOT
             objConn.Open()
 
             AlloyDataAdapter.SelectCommand.Parameters.Clear()
-            AlloyDataAdapter.SelectCommand.CommandText = "SELECT  ALLOY_DESCR FROM  ALLOYS WHERE  (PARTNO = @PARTNO)"
+            AlloyDataAdapter.SelectCommand.CommandText = "SELECT  ALLOY_DESCR FROM  ALLOYS with (NOLOCK) WHERE  (PARTNO = @PARTNO)"
             AlloyDataAdapter.SelectCommand.Parameters.AddWithValue("@PARTNO", TextBox1.Text)
             S = AlloyDataAdapter.SelectCommand.ExecuteScalar
         Finally
@@ -548,7 +548,7 @@ nextrow:
     Private Sub ContextMenuStrip1_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip1.Opening
         PullLotHistoryToolStripMenuItem.Visible = False
         If DataGridView1.SelectedCells.Count = 1 Then
-            If DataGridView1.SelectedCells(0).ColumnIndex = DataGridView1.Columns("WORKORDER").Index Then PullLotHistoryToolStripMenuItem.Visible = True
+            ' If DataGridView1.SelectedCells(0).ColumnIndex = DataGridView1.Columns("WORKORDER").Index Then PullLotHistoryToolStripMenuItem.Visible = True
         End If
     End Sub
 

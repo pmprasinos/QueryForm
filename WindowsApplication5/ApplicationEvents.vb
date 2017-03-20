@@ -70,7 +70,7 @@ tryonemoregain:
 
         Public Function getListOfMotonum() As String(,)
             Dim SQL As String = "SELECT DISTINCT CUSTOMER_PARTNO, CASE WHEN LEN(PARTNO)=4 THEN '0' + PARTNO ELSE PARTNO END AS PARTNO 
-                                    FROM WFLOCAL..SHOPS
+                                    FROM WFLOCAL..SHOPS 
                                     ORDER BY PARTNO DESC"
             Try
                 If Not My.Computer.Network.Ping("10.60.3.14") Then MsgBox("Server SLREPORT01 is offline. Contact IT.")
@@ -83,10 +83,9 @@ tryonemoregain:
             Dim PartList As New List(Of String)
             Dim x As Integer = 0
             Using CMD As New SqlClient.SqlCommand(SQL)
-                Using CN As New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-;Connection Timeout = 3;")
+                Using CN As New SqlClient.SqlConnection("Server=SLREPORT01; Database=WFLocal; User Id=PrasinosApps; Password=Wyman123-; Connection Timeout = 5;")
                     CMD.Connection = CN
                     Try
-
                         CN.Open()
                         'Debug.Print(CN.ConnectionTimeout)
                         Using sqrd As SqlClient.SqlDataReader = CMD.ExecuteReader

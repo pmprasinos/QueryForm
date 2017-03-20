@@ -421,6 +421,7 @@ Partial Class XRLOT
         'ButtonMovementInq
         '
         Me.ButtonMovementInq.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonMovementInq.Enabled = False
         Me.ButtonMovementInq.Location = New System.Drawing.Point(169, 279)
         Me.ButtonMovementInq.Name = "ButtonMovementInq"
         Me.ButtonMovementInq.Size = New System.Drawing.Size(116, 22)

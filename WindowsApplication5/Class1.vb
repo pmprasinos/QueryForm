@@ -426,7 +426,7 @@ Public Class class1
         Dim bSerializer As New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
         Dim sw As New System.IO.MemoryStream()
         bSerializer.Serialize(sw, obj)
-        FileIO.FileSystem.WriteAllText(OutPath, vbCrLf & Now() & GetDotNetVersion.Get45PlusFromRegistry & ":", True)
+        FileIO.FileSystem.WriteAllText(OutPath, vbCrLf & vbCrLf & Now() & GetDotNetVersion.Get45PlusFromRegistry & ":", True)
         FileIO.FileSystem.WriteAllBytes(OutPath, sw.ToArray(), True)
         sw.Close()
     End Sub
